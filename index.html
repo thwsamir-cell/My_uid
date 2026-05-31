@@ -1,29 +1,52 @@
-// GitHub वाले कोड में नीचे वाला function बदल दें:
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>SAMIR DAHIT | UID EXTREME</title>
+    <style>
+        body { background: #000; color: #0f0; font-family: monospace; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
+        .box { border: 2px solid #0f0; padding: 25px; border-radius: 15px; width: 90%; max-width: 400px; text-align: center; box-shadow: 0 0 15px #0f0; }
+        input { width: 90%; padding: 12px; margin: 15px 0; background: #111; border: 1px solid #0f0; color: #0f0; border-radius: 5px; }
+        button { background: #0f0; color: #000; border: none; padding: 12px 25px; cursor: pointer; font-weight: bold; border-radius: 5px; width: 100%; }
+        #result { margin-top: 20px; font-size: 1.2rem; color: #fff; word-break: break-all; border-top: 1px solid #333; padding-top: 15px; }
+    </style>
+</head>
+<body>
 
-async function extractFacebookUID() {
-    let input = document.getElementById('fbLink').value.trim();
-    let res = document.getElementById('res');
-    
-    if(!input) { alert("Link daalo bhai!"); return; }
-    res.innerText = "Searching... (thoda wait karo)";
+<div class="box">
+    <h3>SAMIR DAHIT TOOL</h3>
+    <input type="text" id="fbInput" placeholder="Paste Username or Profile Link...">
+    <button onclick="getUID()">Extract UID Now</button>
+    <div id="result">Waiting for input...</div>
+</div>
 
-    // Proxy API का इस्तेमाल (CORS bypass करने के लिए)
-    const proxyUrl = 'https://api.allorigins.win/get?url=' + encodeURIComponent('https://lookup-id.com/');
-    
-    try {
-        // यह तरीका फेसबुक प्रोफाइल के सोर्स कोड को स्कैन करता है
-        const response = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(input)}`);
-        const data = await response.json();
-        
-        // सोर्स कोड में "profile_id" ढूंढना
-        const match = data.contents.match(/"profile_id":"(\d+)"/);
-        
-        if (match && match[1]) {
-            res.innerHTML = "UID Found: <br> <strong>" + match[1] + "</strong>";
-        } else {
-            res.innerHTML = "Auto-extract nahi ho paya. <br> Shayad profile private hai ya link galat hai.";
+<script>
+    async function getUID() {
+        const input = document.getElementById('fbInput').value.trim();
+        const res = document.getElementById('result');
+        res.innerHTML = "Processing...";
+
+        // ये API सीधा Facebook Username को UID में बदलती है
+        const api = "https://api.findidfb.com/api.php?url=" + encodeURIComponent(input);
+
+        try {
+            // हम 'AllOrigins' का उपयोग कर रहे हैं ताकि CORS का चक्कर न पड़े
+            const response = await fetch("https://api.allorigins.win/get?url=" + encodeURIComponent(api));
+            const data = await response.json();
+            
+            // डेटा को क्लीन करके UID दिखाएंगे
+            const final = JSON.parse(data.contents);
+            
+            if(final.id) {
+                res.innerHTML = "Success! UID: <br><h2 style='color:#0ff'>" + final.id + "</h2>";
+            } else {
+                res.innerHTML = "Error: UID nahi mila. Link sahi hai ya profile private hai?";
+            }
+        } catch (err) {
+            // अगर API न चले तो एक क्विक लिंक बटन दे रहे हैं ताकि काम न रुके
+            res.innerHTML = "Server Busy. Try manual lookup: <br><br> <a href='https://lookup-id.com/' target='_blank' style='color:#0ff'>CLICK HERE FOR MANUAL FIND</a>";
         }
-    } catch (e) {
-        res.innerText = "Error: Proxy block ho gaya. Phir se try karo.";
     }
-}
+</script>
+</body>
+</html>
